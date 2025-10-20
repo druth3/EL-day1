@@ -1,71 +1,74 @@
 import java.util.*;
+
 public class ExpressionCalculator {
-    public static double evaluateExpression(String expression) {
-        expression = expression.replaceAll("\\s+", "");
-        List<String> postfix = infixToPostfix(expression);
-        return evaluatePostfix(postfix);
+    public static double evalExpr(String expr) {
+        expr = expr.replaceAll("\\s+", "");
+        List<String> post = toPostfix(expr);
+        return evalPost(post);
     }
-    private static List<String> infixToPostfix(String expr) {
-        List<String> output = new ArrayList<>();
-        Stack<Character> operators = new Stack<>();
-        StringBuilder number = new StringBuilder();
+
+    private static List<String> toPostfix(String expr) {
+        List<String> out = new ArrayList<>();
+        Stack<Character> ops = new Stack<>();
+        StringBuilder num = new StringBuilder();
+
         for (int i = 0; i < expr.length(); i++) {
             char c = expr.charAt(i);
             if (Character.isDigit(c) || c == '.') {
-                number.append(c);
+                num.append(c);
             } else {
-                if (number.length() > 0) {
-                    output.add(number.toString());
-                    number.setLength(0);
+                if (num.length() > 0) {
+                    out.add(num.toString());
+                    num.setLength(0);
                 }
-                if (isOperator(c)) {
-                    while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(c)) {
-                        output.add(String.valueOf(operators.pop()));
+                if (isOp(c)) {
+                    while (!ops.isEmpty() && prec(ops.peek()) >= prec(c)) {
+                        out.add(String.valueOf(ops.pop()));
                     }
-                    operators.push(c);
+                    ops.push(c);
                 } else if (c == '(') {
-                    operators.push(c);
+                    ops.push(c);
                 } else if (c == ')') {
-                    while (!operators.isEmpty() && operators.peek() != '(') {
-                        output.add(String.valueOf(operators.pop()));
+                    while (!ops.isEmpty() && ops.peek() != '(') {
+                        out.add(String.valueOf(ops.pop()));
                     }
-                    if (!operators.isEmpty()) operators.pop();
+                    if (!ops.isEmpty()) ops.pop();
                 }
             }
         }
 
-        if (number.length() > 0) output.add(number.toString());
-        while (!operators.isEmpty()) output.add(String.valueOf(operators.pop()));
+        if (num.length() > 0) out.add(num.toString());
+        while (!ops.isEmpty()) out.add(String.valueOf(ops.pop()));
 
-        return output;
+        return out;
     }
-    private static double evaluatePostfix(List<String> postfix) {
-        Stack<Double> stack = new Stack<>();
 
-        for (String token : postfix) {
-            if (isNumber(token)) {
-                stack.push(Double.parseDouble(token));
+    private static double evalPost(List<String> post) {
+        Stack<Double> stk = new Stack<>();
+
+        for (String t : post) {
+            if (isNum(t)) {
+                stk.push(Double.parseDouble(t));
             } else {
-                double b = stack.pop();
-                double a = stack.pop();
-                switch (token) {
-                    case "+" -> stack.push(a + b);
-                    case "-" -> stack.push(a - b);
-                    case "*" -> stack.push(a * b);
+                double b = stk.pop();
+                double a = stk.pop();
+                switch (t) {
+                    case "+" -> stk.push(a + b);
+                    case "-" -> stk.push(a - b);
+                    case "*" -> stk.push(a * b);
                     case "/" -> {
-                        if (b == 0) throw new ArithmeticException("Division by zero!");
-                        stack.push(a / b);
+                        if (b == 0) throw new ArithmeticException("Divide by zero!");
+                        stk.push(a / b);
                     }
-                    case "^" -> stack.push(Math.pow(a, b));
-                    case "%" -> stack.push(a % b);
+                    case "^" -> stk.push(Math.pow(a, b));
+                    case "%" -> stk.push(a % b);
                 }
             }
         }
-
-        return stack.pop();
+        return stk.pop();
     }
 
-    private static boolean isNumber(String s) {
+    private static boolean isNum(String s) {
         try {
             Double.parseDouble(s);
             return true;
@@ -74,11 +77,11 @@ public class ExpressionCalculator {
         }
     }
 
-    private static boolean isOperator(char c) {
+    private static boolean isOp(char c) {
         return "+-*/^%".indexOf(c) != -1;
     }
 
-    private static int precedence(char op) {
+    private static int prec(char op) {
         return switch (op) {
             case '+', '-' -> 1;
             case '*', '/', '%' -> 2;
@@ -86,30 +89,30 @@ public class ExpressionCalculator {
             default -> -1;
         };
     }
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         System.out.println("Smart Java Expression Calculator");
-        System.out.println("Type mathematical expressions like:");
+        System.out.println("Examples:");
         System.out.println("5+3*2");
         System.out.println("(10-4)/2");
-        System.out.println("2^3 + 5*(6-2)");
+        System.out.println("2^3+5*(6-2)");
         System.out.println("Type 'exit' to quit.\n");
 
-        while (true) {S
+        while (true) {
             try {
                 System.out.print("Enter expression: ");
-                String input = scanner.nextLine();
-                if (input.equalsIgnoreCase("exit")) break;
-
-                double result = evaluateExpression(input);
-                System.out.printf("Result: %.4f%n%n", result);
+                String in = sc.nextLine();
+                if (in.equalsIgnoreCase("exit")) break;
+                double res = evalExpr(in);
+                System.out.printf("Result: %.4f%n%n", res);
             } catch (ArithmeticException e) {
-                System.out.println(" Error: " + e.getMessage() + "\n");
+                System.out.println("Error: " + e.getMessage() + "\n");
             } catch (Exception e) {
-                System.out.println(" Invalid expression! Please try again.\n");
+                System.out.println("Invalid expression! Try again.\n");
             }
         }
-        System.out.println(" Goodbye!. Try Again.");
-        scanner.close();
+        System.out.println("Goodbye! Try again soon.");
+        sc.close();
     }
 }
