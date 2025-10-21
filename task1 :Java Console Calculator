@@ -109,3 +109,5 @@ public class ExpressionCalculator {
         sc.close();
     }
 }
+
+//there is also simple method to slove this only using some small input and output but i have learned to evaluate for a string
