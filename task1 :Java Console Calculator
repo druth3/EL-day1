@@ -1,17 +1,14 @@
 import java.util.*;
-
 public class ExpressionCalculator {
     public static double evalExpr(String expr) {
         expr = expr.replaceAll("\\s+", "");
         List<String> post = toPostfix(expr);
         return evalPost(post);
     }
-
     private static List<String> toPostfix(String expr) {
         List<String> out = new ArrayList<>();
         Stack<Character> ops = new Stack<>();
         StringBuilder num = new StringBuilder();
-
         for (int i = 0; i < expr.length(); i++) {
             char c = expr.charAt(i);
             if (Character.isDigit(c) || c == '.') {
@@ -36,7 +33,6 @@ public class ExpressionCalculator {
                 }
             }
         }
-
         if (num.length() > 0) out.add(num.toString());
         while (!ops.isEmpty()) out.add(String.valueOf(ops.pop()));
 
@@ -67,7 +63,6 @@ public class ExpressionCalculator {
         }
         return stk.pop();
     }
-
     private static boolean isNum(String s) {
         try {
             Double.parseDouble(s);
@@ -89,7 +84,6 @@ public class ExpressionCalculator {
             default -> -1;
         };
     }
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.println("Smart Java Expression Calculator");
@@ -98,7 +92,6 @@ public class ExpressionCalculator {
         System.out.println("(10-4)/2");
         System.out.println("2^3+5*(6-2)");
         System.out.println("Type 'exit' to quit.\n");
-
         while (true) {
             try {
                 System.out.print("Enter expression: ");
